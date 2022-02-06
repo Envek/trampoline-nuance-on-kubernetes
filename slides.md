@@ -148,25 +148,133 @@ layout: full
 -->
 
 ---
+layout: intro
+---
 
-TODO: Actual content[^1]
+# Kubernetes 101
 
-[^1]: huh?
-
-
-<style>
-.footnotes-sep {
-  @apply mt-40 opacity-10;
-}
-.footnotes {
-  @apply text-sm opacity-75;
-}
-.footnote-backref {
-  display: none;
-}
-</style>
+Шо, какой ещё Kubernetes?
 
 ---
+
+## Зачем разработчику знать Kubernetes?
+
+TL;DR: Чтобы быстрее деплоить новые фичи самим и не ждать админов/девопсов.
+
+- [Kubernets'а бояться — в деплой не ходить](https://youtu.be/bOpBWZt9HPM) от марсианского SRE.
+
+  <div class="flex">
+  <Youtube id="bOpBWZt9HPM" class="max-h-36" />
+  <qr-code url="https://youtu.be/bOpBWZt9HPM" class="ml-16 w-36 h-36" />
+  </div>
+
+- [Вечерняя школа Kubernetes для разработчиков](https://www.youtube.com/playlist?list=PL8D2P0ruohOBSA_CDqJLflJ8FLJNe26K-) от Slurm.io
+
+  <div class="flex">
+  <Youtube id="Mw_rEH2pElw" class="max-h-36" />
+  <qr-code url="https://www.youtube.com/playlist?list=PL8D2P0ruohOBSA_CDqJLflJ8FLJNe26K-" class="ml-16 w-36" />
+  </div>
+
+---
+layout: footnote
+---
+
+## Что такое Kubernetes…
+
+- **Кластерная операционная система** для деплоя приложений
+
+- Абстрагирует приложение от нижележащего железа/облаков\*
+
+- Использует (Docker-)контейнеры для запуска приложений…
+
+- …и свои абстракции для их управления и оркестрации
+
+::footnote::
+
+\* https://buttondown.email/nelhage/archive/two-reasons-kubernetes-is-so-complex/
+
+---
+layout: footnote
+---
+
+## …и из чего он состоит
+
+<a href="https://www.slideshare.net/KirillKouznetsov/how-to-learn-k8s-for-developers/27" target="_blank">
+<img src="/images/how-to-learn-k8s-for-developers-27-1024.webp" class="scaled-image max-h-104 text-center mx-auto" />
+</a>
+
+::footnote::
+
+Источник: [Kubernets'а бояться — в деплой не ходить (слайды)](https://www.slideshare.net/KirillKouznetsov/how-to-learn-k8s-for-developers/)
+
+---
+layout: two-cols
+class: relative
+---
+
+## Pod
+
+ - минимальная и главная единица в k8s — «атом» ⚛️
+
+ - логически неделимая группа контейнеров (но обычно 1 основной)
+
+ - запускаются вместе на одной машине
+
+ - делят между собой localhost, сеть и пространство процессов
+
+ - есть внутрикластерный IP-адрес
+
+ - с точки зрения приложения — как будто отдельный сервер
+
+<div class="absolute bottom-0 text-sm">
+Документация: <a href="https://kubernetes.io/docs/concepts/workloads/pods/" target="_blank">kubernetes.io/docs/concepts/workloads/pods</a>
+</div>
+
+::right::
+
+<img src="/images/kubernetes_nodes_pods.svg" class="scaled-image">
+
+
+<div class="absolute bottom-0 text-sm">
+Картинка: <a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/explore/explore-intro/" target="_blank">kubernetes.io/docs/tutorials/kubernetes-basics/explore/explore-intro</a>
+</div>
+
+---
+layout: two-cols
+class: relative
+---
+
+## Service
+
+ - абстракция для логической группировки pod'ов
+
+ - Service discovery — есть внутрикластерное DNS-имя
+
+ - Балансируют трафик между своими подами
+
+ - Позволяет нам масштабировать приложения горизонтально
+
+<div class="absolute bottom-0 text-sm">
+Документация: <a href="https://kubernetes.io/docs/concepts/services-networking/service/" target="_blank">kubernetes.io/docs/concepts/services-networking/service</a>
+</div>
+
+::right::
+
+<img src="/images/kubernetes_services.svg" class="scaled-image">
+
+<div class="absolute bottom-0 text-sm">
+Картинка: <a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/" target="_blank">kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro</a>
+</div>
+
+<!--
+
+Под включается в сервис, когда:
+
+ - его labels совпали с matchlabels у сервиса
+
+ - у него успешно проходит readiness check (если есть)
+
+-->
 
 ---
 layout: footnote
