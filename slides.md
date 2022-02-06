@@ -277,6 +277,208 @@ class: relative
 -->
 
 ---
+layout: intro
+---
+
+# Healthcheck'и
+
+зачем их столько и в чём разница?
+
+---
+layout: footnote
+---
+## Kubernetes health probes
+
+У каждого отдельного **контейнера** внутри каждого пода:
+
+ - liveness
+
+   Контейнер убивается и перезапускается, если он не отвечает на «ты жив?».
+
+ - readiness
+
+   Под исключается из балансировки трафика через сервис, если не отвечает на «ну что, готов?» и включается обратно, когда отвечает утвердительно.
+
+ - startup (k8s 1.20+)
+
+   Позволяет отсрочить начало liveness и readiness проверок для долгозапускающихся приложений
+
+**Важно**: и liveness и readiness выполняются параллельно всё время жизни пода.
+
+::footnote::
+
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+
+---
+layout: two-cols
+class: relative
+---
+
+## Просто (и неправильно)
+
+Одинаковые пробы для веб-приложения:
+
+```yaml {all|3-8|9-14|5-6,11-12}
+containers:
+  - name: app
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      timeoutSeconds: 3
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      timeoutSeconds: 3
+      periodSeconds: 10
+```
+
+::right::
+
+<img src="/images/ctrl-c-ctrl-v-dump-2016.png" class="scaled-image p-12">
+
+<div class="absolute bottom-0 text-xs">
+Картинка: <a href="https://www.behance.net/gallery/35173039/Stickers-for-another-one-IT-conference-(DUMP2016)" target="_blank">behance.net/gallery/35173039/Stickers-for-another-one-IT-conference-(DUMP2016)</a>
+</div>
+
+
+---
+layout: image
+image: /images/what-is-the-difference.jpg
+class: relative
+---
+
+<div class="absolute bottom-4 text-2xl text-center w-full">
+А какая разница?
+</div>
+
+---
+layout: footnote
+footnoteClass: text-sm
+---
+
+## Очереди запросов
+
+Запросы ждут свободного воркера/бэкенда в Nginx или апп-сервере.
+
+<img src="/images/puma-request-queue.png" class="scaled-image text-center mx-auto max-h-96">
+
+::footnote::
+
+Картинка: https://railsautoscale.com/request-queue-time/
+
+---
+class: text-xl
+---
+
+## Приходит нагрузка 🏋️
+
+ 1. Медленные запросы попадают на один под и «забивают» его
+
+ 2. «Забитый» контейнер в поде перестаёт отвечать на liveness 🥀
+
+ 3. Kubernetes убивает контейнер 💀
+
+ 4. И тут же запускает его заново, но это занимает какое-то время… ⌚
+
+ 4. На время перезапуска на другие поды приходит больше запросов.
+
+ 5. GOTO 1 🤡
+
+<div class="text-xl border border-2 border-red-600 rounded-lg p-4 my-12">
+Неправильно настроенная liveness-проба под нагрузкой убьёт приложение, под за подом!
+</div>
+
+---
+layout: image
+image: /images/death-knocking-on-doors.png
+class: relative
+---
+
+<div class="absolute bottom-0 text-sm">
+Картинка: https://knowyourmeme.com/photos/1901279-death-knocking-on-doors
+</div>
+
+---
+layout: two-cols
+class: relative
+---
+
+## Что же делать?
+
+Пустить liveness пробу в обход!
+
+```yaml {6}
+containers:
+  - name: app
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080 # ← другой порт
+      timeoutSeconds: 3
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      timeoutSeconds: 3
+      periodSeconds: 10
+```
+
+::right::
+
+<img src="/images/do-it-the-right-way.png" class="scaled-image p-12">
+
+<div class="absolute bottom-0 text-xs">
+Картинка: <a href="https://www.behance.net/gallery/35173039/Stickers-for-another-one-IT-conference-(DUMP2016)" target="_blank">behance.net/gallery/35173039/Stickers-for-another-one-IT-conference-(DUMP2016)</a>
+</div>
+
+---
+
+## Healthcheck'и: итого
+
+ 1. **Liveness ходит через «чёрный ход»**
+
+    Поднимите listener на отдельном порту, куда будет ходить только проба.
+
+    <div class="text-xl border border-2 border-red-600 rounded-lg p-4 my-4">
+    Kubernetes не должен прибивать ваши поды под нагрузкой!
+    </div>
+
+ 2. **Readiness ходит вместе с клиентскими запросами**
+
+    Позвольте «забитому» поду выйти из балансировки и «остыть».
+
+    Таймаут нужно подобрать эмпирически, он не должен быть слишком мал.
+
+<div class="text-xl border border-2 border-green-600 rounded-lg p-4 my-12">
+<strong>Мораль</strong>: делайте стресс-тесты!
+</div>
+
+
+---
+
+## Следите за очередью запросов!
+
+<p class="text-lg">Время ожидания запросов в очереди — это главная метрика, которая показывает, что приложение «на пределе». Выведите её себе в мониторинг.</p>
+
+Если она ощутимо больше 0 — надо скейлиться вверх (в Kubernetes есть Horizontal Pod Autoscaler)
+
+Если она строго 0 — вы зря ускоряете глобальное потепление (можно скейлиться вниз).
+
+
+---
+layout: intro
+---
+
+# Ну всё
+
+Ну почти.
+
+---
 layout: footnote
 ---
 
