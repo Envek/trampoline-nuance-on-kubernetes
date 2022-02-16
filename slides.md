@@ -19,10 +19,10 @@ fonts:
 
 ---
 
-# <span class="wobbling">Nuance</span> on Kubernetes
+# <span class="wobbling">Нюансы</span><span class="block text-xl ultra-expanded">запуска приложений в</span><span class="ultra-condensed">Kubernetes</span>
 
 <div class="absolute bottom-0 my-2">
-Новиков Андрей<br />
+Новиков Андрей, Злые марсиане<br />
 <small><a href="https://www.trampoline.to/event/trampoline-8">Trampoline meetup №8</a></small><br />
 <small><time datetime="2022-02-24">24 февраля 2022</time></small>
 </div>
@@ -43,13 +43,23 @@ fonts:
     animation-direction: alternate;
   }
 
+  .ultra-condensed {
+    font-stretch: 3%;
+  }
+
+  .ultra-expanded {
+    font-stretch: 9%;
+  }
+
   @keyframes wobbling {
     from {
       font-weight: 40;
+      font-stretch: 9%;
     }
 
     to {
       font-weight: 200;
+      font-stretch: 7%;
     }
   }
 </style>
