@@ -469,6 +469,180 @@ containers:
 
 Если она строго 0 — вы зря ускоряете глобальное потепление (можно скейлиться вниз).
 
+---
+layout: intro
+---
+
+# Requests и limits
+
+Как (не)правильно просить ресурсы и у кого.
+
+---
+
+## Requests и limits 101
+
+Для каждого контейнера в Pod'е:
+
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+```
+
+requests и limits для Pod — сумма значений его контейнеров.
+
+requests — инструкции для планировщика k8s
+
+limits — инструкции для ядра ОС на нодах кластера
+
+cpu — измеряются в millicpu (тысячных долях процессорного ядра)
+
+memory — измеряются в байтах и кратных (мебибайты, гебибайты)
+
+---
+layout: two-cols
+class: relative
+---
+
+## Requests 101
+
+Инструкции для планировщика k8s для распределения Pod'ов на ноды:
+
+```yaml {2-4}
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+```
+
+ - Не используются в рантайме\*
+ - Не учитывают фактическое потребление\*, только requests других подов
+
+<div class="absolute bottom-0 text-xs">
+* Используются при настройке OOM, но про это дальше
+</div>
+
+::right::
+
+<img src="/images/requests-and-scheduling.png" class="scaled-image p-12">
+
+<div class="absolute bottom-0 text-xs pl-12">
+Картинка: <a href="https://github.com/deponian" target="_blank">Илья Черепанов</a>, Марсианская школа k8s
+</div>
+
+
+---
+layout: two-cols
+class: relative
+---
+
+## Limits 101
+
+Инструкции для ядра ОС на нодах:
+
+```yaml {5-7}
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 400m
+    memory: 512Mi
+```
+
+ - cpu настраивает троттлинг CPU
+
+ - memory настраивает Out of Memory Killer
+
+
+---
+layout: footnote
+footnoteClass: text-xs
+---
+
+## Так, что там за milliCPU ещё?
+
+<div class="grid grid-cols-5 grid-rows-2 gap-4">
+
+<div class="text-sm col-span-3">
+
+В случае limits настраивает CPU throttling — долю процессорного времени, которое можно использовать в течение 100мс.
+
+</div>
+
+<img src="/images/unconstrainedCPU_limits.png" class="scaled-image col-span-2 max-h-36"/>
+
+<div class="col-span-3 text-sm">
+
+```yaml {6}
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 400m
+    memory: 512Mi
+```
+
+</div>
+
+<img src="/images/constrainedCPU_limits.png" class="scaled-image col-span-2 max-h-36"/>
+</div>
+
+
+<div class="border border-2 border-green-600 rounded-lg p-4 my-3">
+Не указывайте дробные CPU limits для контейнеров, где важна скорость ответа!
+</div>
+
+
+::footnote::
+
+Иллюстрация и детали: https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/
+
+---
+layout: footnote
+footnoteClass: text-xs
+---
+
+## Requests × Limits = QoS
+
+В различных сочетаниях реквестов и лимитов поведение контейнера может меняться драматично:
+
+<div class="grid grid-cols-5 gap-4">
+
+<div class="text-sm col-span-3">
+
+ 1. `Guaranteed` — requests = limits
+    - гарантированно выдаётся CPU
+    - убиваются по OOM последними
+ 2. `Burstable` — requests ≠ limits
+    - могут использовать CPU больше запрошенного
+    - убиваются после BestEffort, в порядке «жадности»
+ 3. `BestEffort` — нет ни requests ни limits
+    - CPU выдаётся в последнюю очередь
+    - Первыми убиваются OOM-киллером
+
+<div class="border border-2 border-green-600 rounded-lg p-4 my-4">
+Всегда указывайте и requests и limits!
+</div>
+
+
+</div>
+
+<img src="/images/qos-requests-limits.png" class="scaled-image col-span-2">
+
+</div>
+
+::footnote::
+
+Подробнее: [Управление ресурсами в Kubernetes — habr.com/ru/company/flant/blog/459326/](https://habr.com/ru/company/flant/blog/459326/)
 
 ---
 layout: intro
