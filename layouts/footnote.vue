@@ -16,3 +16,9 @@ const props = defineProps({
     </div>
   </div>
 </template>
+
+<style>
+.footnote-container > .footnote > p:first-child {
+  margin-top: 0;
+}
+</style>

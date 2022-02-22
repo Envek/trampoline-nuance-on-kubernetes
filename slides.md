@@ -158,6 +158,16 @@ layout: full
 -->
 
 ---
+layout: full
+---
+
+<a href="https://evilmartians.com/?utm_source=trampoline&utm_medium=slides&utm_campaign=nuance-on-kubernetes"><img alt="Evil Martians" src="/images/Evil-Martians_Logo_Kubernetes.svg" class="text-center m-auto"/></a>
+
+<!--
+Ну вот, мы все такие злые и можем в Кубернетес. Любим, умеем, практикуем, как говорится.
+-->
+
+---
 layout: intro
 ---
 
@@ -175,18 +185,19 @@ TL;DR: Чтобы быстрее деплоить новые фичи самим
 
   <div class="flex">
   <Youtube id="bOpBWZt9HPM" class="max-h-36" />
-  <qr-code url="https://youtu.be/bOpBWZt9HPM" class="ml-16 w-36 h-36" />
+  <qr-code url="https://youtu.be/bOpBWZt9HPM" class="ml-16 w-36 h-36 px-0 py-0" />
   </div>
 
 - [Вечерняя школа Kubernetes для разработчиков](https://www.youtube.com/playlist?list=PL8D2P0ruohOBSA_CDqJLflJ8FLJNe26K-) от Slurm.io
 
   <div class="flex">
   <Youtube id="Mw_rEH2pElw" class="max-h-36" />
-  <qr-code url="https://www.youtube.com/playlist?list=PL8D2P0ruohOBSA_CDqJLflJ8FLJNe26K-" class="ml-16 w-36" />
+  <qr-code url="https://www.youtube.com/playlist?list=PL8D2P0ruohOBSA_CDqJLflJ8FLJNe26K-" class="ml-16 w-36 px-0 py-0" />
   </div>
 
 ---
 layout: footnote
+footnoteClass: text-sm
 ---
 
 ## Что такое Kubernetes…
@@ -195,9 +206,11 @@ layout: footnote
 
 - Абстрагирует приложение от нижележащего железа/облаков\*
 
+- Декларативная конфигурация и встроенный control loop
+
 - Использует (Docker-)контейнеры для запуска приложений…
 
-- …и свои абстракции для их управления и оркестрации
+- …и свои абстракции для их оркестрации и запуска
 
 ::footnote::
 
@@ -205,6 +218,7 @@ layout: footnote
 
 ---
 layout: footnote
+footnoteClass: relative
 ---
 
 ## …и из чего он состоит
@@ -216,6 +230,8 @@ layout: footnote
 ::footnote::
 
 Источник: [Kubernets'а бояться — в деплой не ходить (слайды)](https://www.slideshare.net/KirillKouznetsov/how-to-learn-k8s-for-developers/)
+
+<qr-code url="https://www.slideshare.net/KirillKouznetsov/how-to-learn-k8s-for-developers/27" class="absolute bottom-0 right-0 w-36 max-h-36" />
 
 ---
 layout: two-cols
@@ -256,11 +272,13 @@ class: relative
 
 ## Service
 
- - абстракция для логической группировки pod'ов
+ - Абстракция для логической группировки pod'ов
 
  - Service discovery — есть внутрикластерное DNS-имя
 
- - Балансируют трафик между своими подами
+ - Балансируют трафик между своими подами (round robin)
+
+ - Реализованы как набор правил iptables
 
  - Позволяет нам масштабировать приложения горизонтально
 
@@ -270,7 +288,7 @@ class: relative
 
 ::right::
 
-<img src="/images/kubernetes_services.svg" class="scaled-image">
+<img src="/images/kubernetes_services.svg" class="scaled-image mt-16">
 
 <div class="absolute bottom-0 text-sm">
 Картинка: <a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/" target="_blank">kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro</a>
@@ -296,6 +314,7 @@ layout: intro
 
 ---
 layout: footnote
+footnoteClass: text-sm
 ---
 ## Kubernetes health probes
 
@@ -313,7 +332,11 @@ layout: footnote
 
    Позволяет отсрочить начало liveness и readiness проверок для долгозапускающихся приложений
 
+<div class="text-base border border-2 border-green-600 rounded-lg px-4 my-2">
+
 **Важно**: и liveness и readiness выполняются параллельно всё время жизни пода.
+
+</div>
 
 ::footnote::
 
@@ -470,14 +493,62 @@ containers:
 
 
 ---
+layout: footnote
+footnoteClass: text-sm
+---
 
 ## Следите за очередью запросов!
 
-<p class="text-lg">Время ожидания запросов в очереди — это главная метрика, которая показывает, что приложение «на пределе». Выведите её себе в мониторинг.</p>
+**Время ожидания запросов в очереди — это главная метрика**, которая показывает, что приложение «на пределе». **Выведите её себе в мониторинг.**
 
-Если она ощутимо больше 0 — надо скейлиться вверх (в Kubernetes есть Horizontal Pod Autoscaler)
+- Если она ощутимо больше 0 — надо скейлиться вверх (в Kubernetes есть Horizontal Pod Autoscaler)
 
-Если она строго 0 — вы зря ускоряете глобальное потепление (можно скейлиться вниз).
+- Если она всегда строго 0 — можно подумать о скейлинге вниз.
+
+<div class="text-sm border border-2 border-green-600 rounded-lg p-4 my-8">
+Следите за USE и RED метриками, когда дело касается производительности!
+
+ - Utilization: количество свободных воркера
+ - Saturation: время ожидания свободного воркера (95p)
+ - Errors: процент ошибок при обработке запросов
+ - Duration: время обработки запроса (95p)
+
+</div>
+
+
+::footnote::
+
+USE method: https://www.brendangregg.com/usemethod.html
+
+RED method: https://grafana.com/blog/2018/08/02/the-red-method-how-to-instrument-your-services/
+
+<!--
+Если запросы у вас в очереди никогда не ждут — у вас слишком много серверов приложений и вы зря ускоряете глобальное потепление (и  переплачиваете за инфраструктуру).
+-->
+
+---
+layout: footnote
+footnoteClass: text-sm
+---
+
+## А как масштабироваться-то?
+
+<p class="my-8 text-xl">Kubernetes Horizontal Pod Autoscaler!</p>
+
+<div class="flex">
+<Youtube id="B1j5SdzlRPQ" />
+<qr-code url="https://youtu.be/B1j5SdzlRPQ" class="ml-24 w-48 h-48 px-0 py-0" caption="Видео" />
+<qr-code url="https://speakerdeck.com/dragonsmith/razbiraiem-avtoskieilingh-v-kubernetes" class="ml-24 w-48 h-48 px-0 py-0" caption="Слайды" />
+</div>
+
+<div class="border border-2 border-green-600 rounded-lg p-4 my-12">
+Используйте USE-метрики для масштабирования!
+</div>
+
+
+::footnote::
+
+Слайды: https://speakerdeck.com/dragonsmith/razbiraiem-avtoskieilingh-v-kubernetes
 
 ---
 layout: intro
@@ -487,6 +558,9 @@ layout: intro
 
 Как (не)правильно просить ресурсы и у кого.
 
+---
+layout: footnote
+footnoteClass: text-xs relative
 ---
 
 ## Requests и limits 101
@@ -513,6 +587,12 @@ cpu — измеряются в millicpu (тысячных долях проце
 
 memory — измеряются в байтах и кратных (мебибайты, гебибайты)
 
+::footnote::
+
+https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+
+<qr-code url="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" class="w-36 px-0 absolute bottom-0 right-0" />
+
 ---
 layout: two-cols
 class: relative
@@ -536,7 +616,9 @@ resources:
  - Не учитывают фактическое потребление\*, только requests других подов
 
 <div class="absolute bottom-0 text-xs">
-* Используются при настройке OOM, но про это дальше
+
+\* Используются при настройке OOM, но про это дальше
+
 </div>
 
 ::right::
@@ -544,7 +626,9 @@ resources:
 <img src="/images/requests-and-scheduling.png" class="scaled-image p-12">
 
 <div class="absolute bottom-0 text-xs pl-12">
-Картинка: <a href="https://github.com/deponian" target="_blank">Илья Черепанов</a>, Марсианская школа k8s
+
+Картинка: [Илья Черепанов](https://github.com/deponian), внутренняя школа k8s
+
 </div>
 
 
@@ -555,7 +639,7 @@ class: relative
 
 ## Limits 101
 
-Инструкции для ядра ОС на нодах:
+Реализуются ядром ОС на нодах:
 
 ```yaml {5-7}
 resources:
@@ -574,7 +658,7 @@ resources:
 
 ---
 layout: footnote
-footnoteClass: text-xs
+footnoteClass: text-xs relative
 ---
 
 ## Так, что там за milliCPU ещё?
@@ -607,14 +691,16 @@ resources:
 </div>
 
 
-<div class="border border-2 border-green-600 rounded-lg p-4 my-3">
+<div class="border border-2 border-green-600 rounded-lg p-4 my-4 mr-36 text-sm">
 Не указывайте дробные CPU limits для контейнеров, где важна скорость ответа!
 </div>
 
 
 ::footnote::
 
-Иллюстрация и детали: https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/
+Подробнее: https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/
+
+<qr-code url="https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/" class="absolute bottom-0 right-0 px-0" />
 
 ---
 layout: footnote
@@ -655,7 +741,7 @@ footnoteClass: text-xs relative
 
 Подробнее: https://www.speedshop.co/2017/10/12/appserver.html
 
-<qr-code url="https://www.speedshop.co/2017/10/12/appserver.html" class="w-36 px-0 absolute bottom-0 right-0" />
+<qr-code url="https://www.speedshop.co/2017/10/12/appserver.html" class="px-0 absolute bottom-0 right-0" />
 
 
 <!--
@@ -676,7 +762,7 @@ footnoteClass: text-xs relative
 
 ---
 layout: footnote
-footnoteClass: text-xs
+footnoteClass: text-xs relative
 ---
 
 ## Requests × Limits = QoS
@@ -711,6 +797,8 @@ footnoteClass: text-xs
 ::footnote::
 
 Подробнее: [Управление ресурсами в Kubernetes — habr.com/ru/company/flant/blog/459326/](https://habr.com/ru/company/flant/blog/459326/)
+
+<qr-code url="https://habr.com/ru/company/flant/blog/459326/" class="px-0 absolute right-0 bottom-0" />
 
 ---
 layout: intro
