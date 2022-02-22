@@ -700,7 +700,7 @@ resources:
 
 Подробнее: https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/
 
-<qr-code url="https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/" class="absolute bottom-0 right-0 px-0" />
+<qr-code url="https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/" class="absolute bottom-0 right-0 px-0 max-h-32" />
 
 ---
 layout: footnote
@@ -741,7 +741,7 @@ footnoteClass: text-xs relative
 
 Подробнее: https://www.speedshop.co/2017/10/12/appserver.html
 
-<qr-code url="https://www.speedshop.co/2017/10/12/appserver.html" class="px-0 absolute bottom-0 right-0" />
+<qr-code url="https://www.speedshop.co/2017/10/12/appserver.html" class="px-0 absolute bottom-0 right-0 max-h-32" />
 
 
 <!--
@@ -798,7 +798,7 @@ footnoteClass: text-xs relative
 
 Подробнее: [Управление ресурсами в Kubernetes — habr.com/ru/company/flant/blog/459326/](https://habr.com/ru/company/flant/blog/459326/)
 
-<qr-code url="https://habr.com/ru/company/flant/blog/459326/" class="px-0 absolute right-0 bottom-0" />
+<qr-code url="https://habr.com/ru/company/flant/blog/459326/" class="px-0 absolute right-0 bottom-0 max-h-32" />
 
 ---
 layout: intro
