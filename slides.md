@@ -23,7 +23,7 @@ fonts:
 
 <div class="absolute bottom-0 my-2">
 Новиков Андрей, Злые марсиане<br />
-<small><a href="https://www.trampoline.to/event/trampoline-8">Trampoline meetup №8</a></small><br />
+<small><a href="https://www.trampoline.to/event/trampoline-8">Trampoline meetup #8</a></small><br />
 <small><time datetime="2022-02-24">24 февраля 2022</time></small>
 </div>
 
