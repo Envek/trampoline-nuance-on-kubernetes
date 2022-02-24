@@ -65,6 +65,71 @@ fonts:
 </style>
 
 <!--
+Прежде, чем мы начнём погружаться в пучины технологий, я должен сделать одно маленькое, но очень важное заявление.
+-->
+
+---
+layout: intro
+---
+
+# Нет войне!
+
+<style>
+  .slidev-layout.intro h1 {
+    font-size: 7rem !important;
+  }
+</style>
+
+---
+layout: cover
+---
+
+# <span class="wobbling">Нюансы</span><span class="block text-xl ultra-expanded">запуска приложений в</span><span class="ultra-condensed">Kubernetes</span>
+
+<div class="absolute bottom-0 my-2">
+Новиков Андрей, Злые марсиане<br />
+<small><a href="https://www.trampoline.to/event/trampoline-8">Trampoline meetup #8</a></small><br />
+<small><time datetime="2022-02-24">24 февраля 2022</time></small>
+</div>
+
+<div class="absolute bottom-0 right-0 h-40 scaled-image flex">
+  <a href="https://evilmartians.com/" class="w-40 h-40 p-3"><img alt="Evil Martians" src="/images/01_Evil-Martians_Logo_v2.1_RGB.svg" /></a>
+  <a href="https://www.trampoline.to/" class="w-40 h-40 p-4"><img alt="Trampoline" src="/images/trampoline-logo-512x512.png" /></a>
+</div>
+
+<style>
+  a { border-bottom: none !important; }
+
+  .wobbling {
+    animation-duration: 1s;
+    animation-name: wobbling;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-direction: alternate;
+  }
+
+  .ultra-condensed {
+    font-stretch: 3%;
+  }
+
+  .ultra-expanded {
+    font-stretch: 9%;
+  }
+
+  @keyframes wobbling {
+    from {
+      font-weight: 40;
+      font-stretch: 9%;
+    }
+
+    to {
+      font-weight: 200;
+      font-stretch: 7%;
+    }
+  }
+</style>
+
+<!--
 Начнём сегодня вечер с довольно хардкорной темы, пока вы свеженькие. Посмотрим, как можно хитро стрелять себе в ноги с помощью настроек Kubernetes, чтобы, разумеется, оставить свои ноги в целости и сохранности.
 -->
 
