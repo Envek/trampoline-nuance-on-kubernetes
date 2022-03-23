@@ -460,7 +460,7 @@ footnoteClass: text-xs relative
 
    Позволяет отсрочить начало liveness и readiness проверок для долгозапускающихся приложений
 
-<div class="text-sm border border-2 border-green-600 rounded-lg px-4 my-2 mr-32">
+<div class="text-sm px-4 mt-2 mr-32">
 
 **Важно**: и liveness и readiness выполняются параллельно всё время жизни пода.
 
